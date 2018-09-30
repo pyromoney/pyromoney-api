@@ -11,7 +11,7 @@ defmodule Pyromoney.Application do
       # Start the Ecto repository
       supervisor(Pyromoney.Repo, []),
       # Start the endpoint when the application starts
-      supervisor(PyromoneyWeb.Endpoint, []),
+      supervisor(PyromoneyWeb.Endpoint, [])
       # Start your own worker by calling: Pyromoney.Worker.start_link(arg1, arg2, arg3)
       # worker(Pyromoney.Worker, [arg1, arg2, arg3]),
     ]

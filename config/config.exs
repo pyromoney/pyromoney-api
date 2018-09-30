@@ -15,8 +15,7 @@ config :pyromoney, PyromoneyWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "I2ZW/2BfkqHq1tm0kTuLGWZO9dTkkwfXx0lSOmIuvozfRc0HgPDm39859kM77MsD",
   render_errors: [view: PyromoneyWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Pyromoney.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: Pyromoney.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -25,4 +24,4 @@ config :logger, :console,
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
-import_config "#{Mix.env}.exs"
+import_config "#{Mix.env()}.exs"
