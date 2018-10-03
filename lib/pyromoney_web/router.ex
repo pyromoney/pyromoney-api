@@ -14,14 +14,8 @@ defmodule PyromoneyWeb.Router do
   end
 
   scope "/", PyromoneyWeb do
-    # Use the default browser stack
-    pipe_through(:browser)
+    pipe_through(:api)
 
-    get("/", PageController, :index)
+    resources("/accounts", AccountController, except: [:show, :new, :edit])
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", PyromoneyWeb do
-  #   pipe_through :api
-  # end
 end
