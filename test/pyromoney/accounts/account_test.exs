@@ -3,6 +3,7 @@ defmodule Pyromoney.Accounts.AccountTest do
 
   import Pyromoney.Factory
 
+  alias Ecto.{Changeset, NoResultsError, UUID}
   alias Pyromoney.Accounts
   alias Pyromoney.Accounts.Account
 
@@ -50,42 +51,42 @@ defmodule Pyromoney.Accounts.AccountTest do
     test "returns error changeset without a name" do
       params = params_for(:account, name: "")
 
-      assert {:error, %Ecto.Changeset{errors: errors}} = Accounts.create_account(params)
+      assert {:error, %Changeset{errors: errors}} = Accounts.create_account(params)
       assert errors == [name: {"can't be blank", [validation: :required]}]
     end
 
     test "returns error changeset without a type" do
       params = params_for(:account, type: "")
 
-      assert {:error, %Ecto.Changeset{errors: errors}} = Accounts.create_account(params)
+      assert {:error, %Changeset{errors: errors}} = Accounts.create_account(params)
       assert errors == [type: {"can't be blank", [validation: :required]}]
     end
 
     test "returns error changeset with invalid type" do
       params = params_for(:account, type: :unknown)
 
-      assert {:error, %Ecto.Changeset{errors: errors}} = Accounts.create_account(params)
+      assert {:error, %Changeset{errors: errors}} = Accounts.create_account(params)
       assert errors == [type: {"is invalid", [type: Accounts.Type, validation: :cast]}]
     end
 
     test "returns error changeset without a currency" do
       params = params_for(:account, currency: "")
 
-      assert {:error, %Ecto.Changeset{errors: errors}} = Accounts.create_account(params)
+      assert {:error, %Changeset{errors: errors}} = Accounts.create_account(params)
       assert errors == [currency: {"can't be blank", [validation: :required]}]
     end
 
     test "returns error changeset with invalid currency" do
       params = params_for(:account, currency: "SPACE_CREDITS")
 
-      assert {:error, %Ecto.Changeset{errors: errors}} = Accounts.create_account(params)
+      assert {:error, %Changeset{errors: errors}} = Accounts.create_account(params)
       assert errors == [currency: {~s(The currency "SPACE_CREDITS" is invalid), []}]
     end
 
     test "returns error changeset with non-existent parent" do
-      params = params_for(:account, parent_id: Ecto.UUID.generate())
+      params = params_for(:account, parent_id: UUID.generate())
 
-      assert {:error, %Ecto.Changeset{errors: errors}} = Accounts.create_account(params)
+      assert {:error, %Changeset{errors: errors}} = Accounts.create_account(params)
       assert errors == [parent_id: {"does not exist", []}]
     end
   end
@@ -116,7 +117,7 @@ defmodule Pyromoney.Accounts.AccountTest do
       %{id: id, name: name} = account = insert(:account)
       params = params_for(:account, name: "")
 
-      assert {:error, %Ecto.Changeset{}} = Accounts.update_account(account, params)
+      assert {:error, %Changeset{}} = Accounts.update_account(account, params)
       assert %{name: ^name} = Accounts.get_account!(id)
     end
 
@@ -124,7 +125,7 @@ defmodule Pyromoney.Accounts.AccountTest do
       %{id: id} = account = insert(:account)
       params = params_for(:account, parent_id: id)
 
-      assert {:error, %Ecto.Changeset{errors: errors}} = Accounts.update_account(account, params)
+      assert {:error, %Changeset{errors: errors}} = Accounts.update_account(account, params)
       assert errors == [parent_id: {"can't be linked to itself", []}]
     end
   end
@@ -134,7 +135,7 @@ defmodule Pyromoney.Accounts.AccountTest do
       %{id: id} = account = insert(:account)
 
       assert {:ok, %Account{}} = Accounts.delete_account(account)
-      assert_raise Ecto.NoResultsError, fn -> Accounts.get_account!(id) end
+      assert_raise NoResultsError, fn -> Accounts.get_account!(id) end
     end
   end
 end

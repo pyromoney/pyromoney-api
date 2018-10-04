@@ -1,5 +1,11 @@
 defmodule Pyromoney.Application do
+  @moduledoc """
+  A module for working with applications and defining application callbacks.
+  """
+
   use Application
+
+  alias PyromoneyWeb.Endpoint
 
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
@@ -25,7 +31,7 @@ defmodule Pyromoney.Application do
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    PyromoneyWeb.Endpoint.config_change(changed, removed)
+    Endpoint.config_change(changed, removed)
     :ok
   end
 end

@@ -1,10 +1,12 @@
 defmodule Pyromoney.Accounts do
   @moduledoc """
   The Accounts context.
+
+  Account is an entity which contains other sub-accounts, or that contains transactions.
   """
 
-  alias Pyromoney.Repo
   alias Pyromoney.Accounts.Account
+  alias Pyromoney.Repo
 
   @doc """
   Returns the list of accounts.

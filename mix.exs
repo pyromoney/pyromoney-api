@@ -43,7 +43,8 @@ defmodule Pyromoney.Mixfile do
       {:cowboy, "~> 1.0"},
       {:exnumerator, "~> 1.6"},
       {:ex_money, "~> 1.0"},
-      {:ex_machina, "~> 2.2", only: :test}
+      {:ex_machina, "~> 2.2", only: :test},
+      {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false}
     ]
   end
 

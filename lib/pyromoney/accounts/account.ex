@@ -1,4 +1,8 @@
 defmodule Pyromoney.Accounts.Account do
+  @moduledoc """
+  Schema, changesets and validations for accounts.
+  """
+
   use Ecto.Schema
 
   import Ecto.Changeset
