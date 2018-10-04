@@ -11,4 +11,6 @@ before_script:
   - mix do ecto.create, ecto.migrate
 
 script:
+  - mix format --check-formatted
+  - mix credo --strict
   - mix test
