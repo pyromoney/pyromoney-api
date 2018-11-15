@@ -9,6 +9,7 @@ defmodule Pyromoney.Accounts.Account do
 
   alias __MODULE__
   alias Pyromoney.Accounts.Type
+  alias Pyromoney.Payments.Split
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -22,6 +23,8 @@ defmodule Pyromoney.Accounts.Account do
 
     belongs_to(:parent, Account)
     has_many(:children, Account)
+    has_many(:splits, Split)
+    has_many(:transactions, through: [:splits, :transaction])
 
     timestamps()
   end
