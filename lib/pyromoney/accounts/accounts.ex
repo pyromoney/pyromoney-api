@@ -5,6 +5,8 @@ defmodule Pyromoney.Accounts do
   Account is an entity which contains other sub-accounts, or that contains transactions.
   """
 
+  import Ecto.Query
+
   alias Pyromoney.Accounts.Account
   alias Pyromoney.Repo
 
@@ -22,6 +24,21 @@ defmodule Pyromoney.Accounts do
   end
 
   @doc """
+  Returns the list of accounts with matching ids.
+
+  ## Examples
+
+      iex> list_accounts(["7564bfe4-5a0b-4c5f-ac23-110afd7b2310", "unknown-id"])
+      [%Account{id: "7564bfe4-5a0b-4c5f-ac23-110afd7b2310"}]
+
+  """
+  def list_accounts(ids) when is_list(ids) do
+    Account
+    |> where([account], account.id in ^ids)
+    |> Repo.all()
+  end
+
+  @doc """
   Gets a single account.
 
   Raises `Ecto.NoResultsError` if the Account does not exist.
@@ -36,31 +53,6 @@ defmodule Pyromoney.Accounts do
 
   """
   def get_account!(id), do: Repo.get!(Account, id)
-
-  @doc """
-  Returns currency for the specified account ID.
-  Returns nil if account does not exist.
-
-  ## Examples
-
-    iex> get_currency("7564bfe4-5a0b-4c5f-ac23-110afd7b2310")
-    :USD
-
-    iex> get_currency("unknown-id")
-    nil
-
-    iex> get_currency(nil)
-    nil
-  """
-  def get_currency(nil), do: nil
-
-  def get_currency(account_id) do
-    with %Account{currency: currency} <- Repo.get(Account, account_id) do
-      currency
-    else
-      _ -> nil
-    end
-  end
 
   @doc """
   Creates an account.

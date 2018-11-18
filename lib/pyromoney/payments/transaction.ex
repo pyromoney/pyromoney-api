@@ -16,8 +16,7 @@ defmodule Pyromoney.Payments.Transaction do
 
   import Ecto.Changeset
 
-  alias Pyromoney.Accounts
-  alias Pyromoney.Payments.Split
+  alias Pyromoney.Payments.{BalanceValidation, Split}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -38,31 +37,6 @@ defmodule Pyromoney.Payments.Transaction do
     |> cast(attrs, [:description, :timestamp])
     |> cast_assoc(:splits, required: true)
     |> validate_required([:timestamp])
-    |> validate_balance()
-  end
-
-  defp validate_balance(changeset) do
-    validate_change(changeset, :splits, fn :splits, splits ->
-      if balanced?(splits), do: [], else: [splits: "are not balanced"]
-    end)
-  end
-
-  defp balanced?(splits) when is_list(splits) do
-    splits
-    |> Enum.group_by(fn split ->
-      split
-      |> get_field(:account_id)
-      |> Accounts.get_currency()
-    end)
-    |> Enum.all?(&balanced?/1)
-  end
-
-  defp balanced?({_currency, splits}) do
-    zero = Decimal.new(0)
-
-    splits
-    |> Enum.map(&get_field(&1, :amount))
-    |> Enum.reduce(zero, &Decimal.add(&1, &2))
-    |> Decimal.equal?(zero)
+    |> BalanceValidation.validate_balance()
   end
 end

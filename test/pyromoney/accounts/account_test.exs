@@ -15,27 +15,26 @@ defmodule Pyromoney.Accounts.AccountTest do
     end
   end
 
+  describe "list_accounts/1" do
+    test "returns all accounts with matching ids" do
+      %{id: id_1} = account_1 = insert(:account)
+      %{id: id_2} = account_2 = insert(:account)
+      _not_matching_account = insert(:account)
+
+      assert Accounts.list_accounts([id_1, id_2]) == [account_1, account_2]
+    end
+
+    test "does not duplicate entries" do
+      %{id: id} = account = insert(:account)
+      assert Accounts.list_accounts([id, id]) == [account]
+    end
+  end
+
   describe "get_account/1" do
     test "returns the account with given id" do
       %{id: id} = account = insert(:account)
 
       assert Accounts.get_account!(id) == account
-    end
-  end
-
-  describe "get_currency/1" do
-    test "returns currency for the given account id" do
-      %{id: account_id} = insert(:account, currency: "USD")
-
-      assert Accounts.get_currency(account_id) == "USD"
-    end
-
-    test "returns nil for unknown account" do
-      refute Accounts.get_currency(UUID.generate())
-    end
-
-    test "returns nil for empty account id" do
-      refute Accounts.get_currency(nil)
     end
   end
 
