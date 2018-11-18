@@ -16,6 +16,7 @@ defmodule Pyromoney.Payments.Transaction do
 
   import Ecto.Changeset
 
+  alias Pyromoney.Accounts
   alias Pyromoney.Payments.Split
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -46,7 +47,17 @@ defmodule Pyromoney.Payments.Transaction do
     end)
   end
 
-  defp balanced?(splits) do
+  defp balanced?(splits) when is_list(splits) do
+    splits
+    |> Enum.group_by(fn split ->
+      split
+      |> get_field(:account_id)
+      |> Accounts.get_currency()
+    end)
+    |> Enum.all?(&balanced?/1)
+  end
+
+  defp balanced?({_currency, splits}) do
     zero = Decimal.new(0)
 
     splits

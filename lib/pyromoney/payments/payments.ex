@@ -11,11 +11,7 @@ defmodule Pyromoney.Payments do
   @doc """
   Creates a new transaction.
 
-  Restrictions:
-
-    * only simple transactions (between 2 accounts) are currently supported
-    * both accounts should be in the same currency
-    * transaction should be balanced (amount_1 = -amount_2)
+  Transaction should be balanced in each currency separately.
 
   ## Examples
 

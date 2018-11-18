@@ -23,6 +23,22 @@ defmodule Pyromoney.Accounts.AccountTest do
     end
   end
 
+  describe "get_currency/1" do
+    test "returns currency for the given account id" do
+      %{id: account_id} = insert(:account, currency: "USD")
+
+      assert Accounts.get_currency(account_id) == "USD"
+    end
+
+    test "returns nil for unknown account" do
+      refute Accounts.get_currency(UUID.generate())
+    end
+
+    test "returns nil for empty account id" do
+      refute Accounts.get_currency(nil)
+    end
+  end
+
   describe "create_account/1" do
     test "creates a root account with valid data" do
       params = params_for(:account)

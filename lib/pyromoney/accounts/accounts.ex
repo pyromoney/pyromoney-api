@@ -38,6 +38,31 @@ defmodule Pyromoney.Accounts do
   def get_account!(id), do: Repo.get!(Account, id)
 
   @doc """
+  Returns currency for the specified account ID.
+  Returns nil if account does not exist.
+
+  ## Examples
+
+    iex> get_currency("7564bfe4-5a0b-4c5f-ac23-110afd7b2310")
+    :USD
+
+    iex> get_currency("unknown-id")
+    nil
+
+    iex> get_currency(nil)
+    nil
+  """
+  def get_currency(nil), do: nil
+
+  def get_currency(account_id) do
+    with %Account{currency: currency} <- Repo.get(Account, account_id) do
+      currency
+    else
+      _ -> nil
+    end
+  end
+
+  @doc """
   Creates an account.
 
   ## Examples
