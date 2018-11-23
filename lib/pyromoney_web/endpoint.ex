@@ -42,6 +42,7 @@ defmodule PyromoneyWeb.Endpoint do
     signing_salt: "CFTXPy7H"
   )
 
+  plug(CORSPlug)
   plug(PyromoneyWeb.Router)
 
   @doc """
