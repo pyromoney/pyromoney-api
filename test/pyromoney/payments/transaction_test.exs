@@ -7,10 +7,41 @@ defmodule Pyromoney.Payments.TransactionTest do
   alias Pyromoney.Payments
   alias Pyromoney.Payments.{Split, Transaction}
 
-  @description "Shopping"
-  @timestamp "2018-10-14T20:36:38Z"
+  describe "list_transactions/1" do
+    test "returns a list of transactions related to the account" do
+      wallet_account = insert(:account, type: :cash)
+      bank_account = insert(:account, type: :bank)
+      food_account = insert(:account, type: :expense)
+      books_account = insert(:account, type: :expense)
+
+      %{id: transaction_1} = transaction_between(wallet_account, food_account)
+      %{id: transaction_2} = transaction_between(wallet_account, books_account)
+      %{id: transaction_3} = transaction_between(bank_account, food_account)
+
+      assert [
+               %Transaction{id: ^transaction_1, splits: [_, _]},
+               %Transaction{id: ^transaction_2, splits: [_, _]}
+             ] = Payments.list_transactions(wallet_account.id)
+
+      assert [
+               %Transaction{id: ^transaction_3, splits: [_, _]}
+             ] = Payments.list_transactions(bank_account.id)
+
+      assert [
+               %Transaction{id: ^transaction_1, splits: [_, _]},
+               %Transaction{id: ^transaction_3, splits: [_, _]}
+             ] = Payments.list_transactions(food_account.id)
+
+      assert [
+               %Transaction{id: ^transaction_2, splits: [_, _]}
+             ] = Payments.list_transactions(books_account.id)
+    end
+  end
 
   describe "create_transaction/1" do
+    @description "Shopping"
+    @timestamp "2018-10-14T20:36:38Z"
+
     test "creates a simple transaction" do
       [%{id: from_id}, %{id: to_id}] = insert_list(2, :account)
 
