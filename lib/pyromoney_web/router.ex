@@ -16,6 +16,8 @@ defmodule PyromoneyWeb.Router do
   scope "/", PyromoneyWeb do
     pipe_through(:api)
 
-    resources("/accounts", AccountController, except: [:show, :new, :edit])
+    resources("/accounts", AccountController, except: [:show, :new, :edit]) do
+      resources("/transactions", TransactionController, only: [:index])
+    end
   end
 end
