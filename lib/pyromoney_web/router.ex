@@ -19,5 +19,7 @@ defmodule PyromoneyWeb.Router do
     resources("/accounts", AccountController, except: [:show, :new, :edit]) do
       resources("/transactions", TransactionController, only: [:index])
     end
+
+    resources("/transactions", TransactionController, only: [:create])
   end
 end

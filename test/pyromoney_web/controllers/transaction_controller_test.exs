@@ -79,4 +79,72 @@ defmodule PyromoneyWeb.TransactionControllerTest do
       assert response == %{"data" => []}
     end
   end
+
+  describe "POST /transactions" do
+    test "creates new transaction", %{conn: conn} do
+      %{id: wallet_account_id} = insert(:account, type: :cash)
+      %{id: food_account_id} = insert(:account, type: :expense)
+
+      payload = %{
+        transaction: %{
+          description: "Shopping",
+          timestamp: "2018-10-14T20:36:38Z",
+          splits: [
+            %{
+              account_id: wallet_account_id,
+              amount: "-100.50"
+            },
+            %{
+              account_id: food_account_id,
+              amount: "100.50"
+            }
+          ]
+        }
+      }
+
+      response =
+        conn
+        |> post(transaction_path(conn, :create), payload)
+        |> json_response(201)
+
+      assert %{
+               "data" => %{
+                 "id" => _,
+                 "description" => "Shopping",
+                 "timestamp" => "2018-10-14T20:36:38Z",
+                 "splits" => [
+                   %{
+                     "id" => _,
+                     "account_id" => wallet_account_id,
+                     "description" => nil,
+                     "amount" => "-100.50"
+                   },
+                   %{
+                     "id" => _,
+                     "account_id" => food_account_id,
+                     "description" => nil,
+                     "amount" => "100.50"
+                   }
+                 ]
+               }
+             } = response
+    end
+
+    test "renders errors when data is invalid", %{conn: conn} do
+      payload = %{
+        transaction: %{
+          description: "Shopping"
+        }
+      }
+
+      response =
+        conn
+        |> post(transaction_path(conn, :create), payload)
+        |> json_response(422)
+
+      assert response == %{
+               "errors" => %{"splits" => ["can't be blank"], "timestamp" => ["can't be blank"]}
+             }
+    end
+  end
 end
