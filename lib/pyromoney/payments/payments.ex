@@ -15,7 +15,7 @@ defmodule Pyromoney.Payments do
 
   ## Examples
 
-    iex> list_transaction("dff480b3-20d9-4f43-a148-6fa9fddc2d98")
+    iex> list_transactions("dff480b3-20d9-4f43-a148-6fa9fddc2d98")
     [
       %Transaction{
         description: "Shopping",
@@ -33,7 +33,7 @@ defmodule Pyromoney.Payments do
       }
     ]
 
-    iex> iex> list_transaction("c2be25ef-b8b7-413c-b5fb-6dbba6a64182")
+    iex> list_transactions("c2be25ef-b8b7-413c-b5fb-6dbba6a64182")
     []
   """
   def list_transactions(account_id) do
@@ -78,5 +78,22 @@ defmodule Pyromoney.Payments do
     %Transaction{}
     |> Transaction.changeset(attrs)
     |> Repo.insert()
+  end
+
+  @doc """
+  Updates the existing transaction.
+
+  ## Examples
+
+    iex> update_transaction(transaction, %{field: new_value})
+    {:ok, %Transaction{}}
+
+    iex> update_transaction(transaction, %{field: bad_value})
+    {:error, %Ecto.Changeset{}}
+  """
+  def update_transaction(%Transaction{} = transaction, attrs) do
+    transaction
+    |> Transaction.changeset(attrs)
+    |> Repo.update()
   end
 end

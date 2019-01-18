@@ -37,6 +37,20 @@ defmodule Pyromoney.Factory do
     }
   end
 
+  def split_transaction_factory do
+    [from_account, to_account_1, to_account_2] = build_list(3, :account)
+
+    %Transaction{
+      description: sequence(:description, &"Transaction #{&1}"),
+      timestamp: DateTime.utc_now(),
+      splits: [
+        build(:split_no_transaction, account: from_account, amount: Decimal.new(-100.0)),
+        build(:split_no_transaction, account: to_account_1, amount: Decimal.new(70.0)),
+        build(:split_no_transaction, account: to_account_2, amount: Decimal.new(30.0))
+      ]
+    }
+  end
+
   def transaction_between(from_account, to_account, amount \\ 10.0) do
     insert(:transaction,
       splits: [

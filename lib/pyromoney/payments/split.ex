@@ -20,8 +20,10 @@ defmodule Pyromoney.Payments.Split do
     field(:description, :string)
     field(:amount, :decimal)
 
-    belongs_to(:transaction, Transaction)
+    belongs_to(:transaction, Transaction, on_replace: :update)
     belongs_to(:account, Account)
+
+    field(:delete, :boolean, virtual: true)
 
     timestamps()
   end
@@ -29,9 +31,18 @@ defmodule Pyromoney.Payments.Split do
   @doc false
   def changeset(transaction, attrs) do
     transaction
-    |> cast(attrs, [:account_id, :amount, :description])
+    |> cast(attrs, [:account_id, :amount, :description, :delete])
     |> validate_required([:account_id, :amount])
     |> assoc_constraint(:transaction)
     |> assoc_constraint(:account)
+    |> maybe_mark_for_deletion()
+  end
+
+  defp maybe_mark_for_deletion(changeset) do
+    if get_change(changeset, :delete) do
+      %{changeset | action: :delete}
+    else
+      changeset
+    end
   end
 end

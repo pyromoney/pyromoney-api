@@ -255,4 +255,152 @@ defmodule Pyromoney.Payments.TransactionTest do
       assert %Changeset{errors: [splits: {"are not balanced", []}]} = changeset
     end
   end
+
+  describe "update_transaction/2" do
+    @description "New description"
+    @timestamp "2018-10-14T20:36:38Z"
+
+    test "updates transaction and its splits" do
+      %{
+        id: id,
+        splits: [
+          %{id: split_1_id, account_id: from_account_id},
+          %{id: split_2_id, account_id: to_account_id}
+        ]
+      } = transaction = insert(:transaction)
+
+      attrs = %{
+        description: @description,
+        timestamp: @timestamp,
+        splits: [
+          %{id: split_1_id, amount: "-199.99"},
+          %{id: split_2_id, amount: "199.99"}
+        ]
+      }
+
+      assert {:ok, updated_transaction} = Payments.update_transaction(transaction, attrs)
+
+      assert %Transaction{
+               id: ^id,
+               description: @description,
+               timestamp: date_time,
+               splits: [
+                 %{id: ^split_1_id, account_id: ^from_account_id, amount: from_amount},
+                 %{id: ^split_2_id, account_id: ^to_account_id, amount: to_amount}
+               ]
+             } = updated_transaction
+
+      assert {:ok, ^date_time, 0} = DateTime.from_iso8601(@timestamp)
+      assert from_amount == Decimal.new("-199.99")
+      assert to_amount == Decimal.new("199.99")
+    end
+
+    test "deletes splits from split transaction" do
+      %{
+        id: id,
+        splits: [
+          %{id: split_1_id, account_id: from_account_id},
+          %{id: split_2_id, account_id: _},
+          %{id: split_3_id, account_id: to_account_id}
+        ]
+      } = transaction = insert(:split_transaction)
+
+      attrs = %{
+        description: @description,
+        timestamp: @timestamp,
+        splits: [
+          %{id: split_1_id, amount: "-199.99"},
+          %{id: split_2_id, delete: true},
+          %{id: split_3_id, amount: "199.99"}
+        ]
+      }
+
+      assert {:ok, updated_transaction} = Payments.update_transaction(transaction, attrs)
+
+      assert %Transaction{
+               id: ^id,
+               splits: [
+                 %{id: ^split_1_id, account_id: ^from_account_id, amount: from_amount},
+                 %{id: ^split_3_id, account_id: ^to_account_id, amount: to_amount}
+               ]
+             } = updated_transaction
+
+      assert from_amount == Decimal.new("-199.99")
+      assert to_amount == Decimal.new("199.99")
+    end
+
+    test "adds new splits to the transaction" do
+      %{
+        id: id,
+        splits: [
+          %{id: split_1_id, account_id: from_account_id},
+          %{id: split_2_id, account_id: to_account_id}
+        ]
+      } = transaction = insert(:transaction)
+
+      %{id: other_account_id} = insert(:account)
+
+      attrs = %{
+        splits: [
+          %{id: split_1_id, amount: "-100.00"},
+          %{id: split_2_id, amount: "70.00"},
+          %{amount: "30.00", account_id: other_account_id}
+        ]
+      }
+
+      assert {:ok, updated_transaction} = Payments.update_transaction(transaction, attrs)
+
+      assert %Transaction{
+               id: ^id,
+               splits: [
+                 %{id: ^split_1_id, account_id: ^from_account_id, amount: from_amount},
+                 %{id: ^split_2_id, account_id: ^to_account_id, amount: to_amount},
+                 %{id: _, account_id: ^other_account_id, amount: other_amount}
+               ]
+             } = updated_transaction
+
+      assert from_amount == Decimal.new("-100.00")
+      assert to_amount == Decimal.new("70.00")
+      assert other_amount == Decimal.new("30.00")
+    end
+
+    test "returns error when at least one split is not listed in attributes" do
+      %{
+        splits: [
+          %{id: _},
+          %{id: split_2_id}
+        ]
+      } = transaction = insert(:transaction)
+
+      %{id: other_account_id} = insert(:account)
+
+      attrs = %{
+        splits: [
+          %{id: split_2_id, account_id: other_account_id}
+        ]
+      }
+
+      assert {:error, changeset} = Payments.update_transaction(transaction, attrs)
+      assert %Changeset{errors: [splits: {"is invalid", [type: {:array, :map}]}]} = changeset
+    end
+
+    test "returns error when updated transaction is not balanced" do
+      %{
+        splits: [
+          %{id: split_1_id},
+          %{id: split_2_id}
+        ]
+      } = transaction = insert(:transaction)
+
+      attrs = %{
+        splits: [
+          %{id: split_1_id, amount: "-199.99"},
+          %{id: split_2_id, amount: "299.99"}
+        ]
+      }
+
+      assert {:error, changeset} = Payments.update_transaction(transaction, attrs)
+      assert %Changeset{errors: [splits: {"are not balanced", []}]} = changeset
+    end
+  end
 end

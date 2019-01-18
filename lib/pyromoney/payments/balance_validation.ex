@@ -18,9 +18,10 @@ defmodule Pyromoney.Payments.BalanceValidation do
   end
 
   defp balanced?(splits) when is_list(splits) do
-    accounts_to_currencies = accounts_to_currencies(splits)
+    not_deleted_splits = Enum.reject(splits, fn split -> get_change(split, :delete) end)
+    accounts_to_currencies = accounts_to_currencies(not_deleted_splits)
 
-    splits
+    not_deleted_splits
     |> Enum.group_by(&get_currency(&1, accounts_to_currencies))
     |> Enum.all?(&balanced?/1)
   end

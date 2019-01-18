@@ -25,7 +25,7 @@ defmodule Pyromoney.Payments.Transaction do
     field(:description, :string)
     field(:timestamp, :utc_datetime)
 
-    has_many(:splits, Split, on_delete: :delete_all)
+    has_many(:splits, Split, on_delete: :delete_all, on_replace: :mark_as_invalid)
     has_many(:accounts, through: [:splits, :account])
 
     timestamps()
