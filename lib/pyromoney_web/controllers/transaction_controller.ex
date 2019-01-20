@@ -18,4 +18,13 @@ defmodule PyromoneyWeb.TransactionController do
       |> render("show.json", transaction: transaction)
     end
   end
+
+  def update(conn, %{"id" => id, "transaction" => transaction_params}) do
+    transaction = Payments.get_transaction!(id)
+
+    with {:ok, %Transaction{} = transaction} <-
+           Payments.update_transaction(transaction, transaction_params) do
+      render(conn, "show.json", transaction: transaction)
+    end
+  end
 end

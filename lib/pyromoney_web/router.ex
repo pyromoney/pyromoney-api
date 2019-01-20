@@ -20,6 +20,6 @@ defmodule PyromoneyWeb.Router do
       resources("/transactions", TransactionController, only: [:index])
     end
 
-    resources("/transactions", TransactionController, only: [:create])
+    resources("/transactions", TransactionController, only: [:create, :update])
   end
 end

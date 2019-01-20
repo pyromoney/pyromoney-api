@@ -38,6 +38,17 @@ defmodule Pyromoney.Payments.TransactionTest do
     end
   end
 
+  describe "get_transaction!/1" do
+    test "returns the transaction with preloaded splits with given id" do
+      %{id: id} = insert(:transaction)
+
+      assert %Transaction{
+               id: ^id,
+               splits: [_, _]
+             } = Payments.get_transaction!(id)
+    end
+  end
+
   describe "create_transaction/1" do
     @description "Shopping"
     @timestamp "2018-10-14T20:36:38Z"
@@ -306,8 +317,6 @@ defmodule Pyromoney.Payments.TransactionTest do
       } = transaction = insert(:split_transaction)
 
       attrs = %{
-        description: @description,
-        timestamp: @timestamp,
         splits: [
           %{id: split_1_id, amount: "-199.99"},
           %{id: split_2_id, delete: true},

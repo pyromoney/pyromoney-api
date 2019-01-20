@@ -35,6 +35,7 @@ defmodule Pyromoney.Payments do
 
     iex> list_transactions("c2be25ef-b8b7-413c-b5fb-6dbba6a64182")
     []
+
   """
   def list_transactions(account_id) do
     Repo.all(
@@ -47,6 +48,22 @@ defmodule Pyromoney.Payments do
       )
     )
   end
+
+  @doc """
+  Gets a single transaction.
+
+  Raises `Ecto.NoResultsError` if the transaction does not exist.
+
+  ## Examples
+
+      iex> get_transaction!("7564bfe4-5a0b-4c5f-ac23-110afd7b2310")
+      %Transaction{}
+
+      iex> get_transaction!("unknown-id")
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_transaction!(id), do: Repo.get!(from(Transaction, preload: [:splits]), id)
 
   @doc """
   Creates a new transaction.
@@ -73,6 +90,7 @@ defmodule Pyromoney.Payments do
 
     iex> create_transaction(%{})
     {:error, %Ecto.Changeset{}}
+
   """
   def create_transaction(attrs) do
     %Transaction{}
@@ -90,6 +108,7 @@ defmodule Pyromoney.Payments do
 
     iex> update_transaction(transaction, %{field: bad_value})
     {:error, %Ecto.Changeset{}}
+
   """
   def update_transaction(%Transaction{} = transaction, attrs) do
     transaction
